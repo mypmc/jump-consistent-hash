@@ -1,3 +1,5 @@
+#![deny(warnings)]
+
 //! Implements 'Jump Consistent Hash' from the paper
 //! [A Fast, Minimal Memory, Consistent Hash Algorithm](http://arxiv.org/abs/1406.2294)
 //! by John Lamping, Eric Veach (2014).
