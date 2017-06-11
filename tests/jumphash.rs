@@ -1,5 +1,5 @@
-extern crate jump_consistent_hash;
-use jump_consistent_hash::hash;
+extern crate jump_consistent_hash as jump_hash;
+use jump_hash::hash;
 
 struct Test {
     key: u64,
@@ -28,9 +28,9 @@ fn table_test() {
         }
     ];
     for test in tests {
-        for (i, len) in test.len.iter().enumerate() {
+        for (i, &len) in test.len.iter().enumerate() {
             let got = hash(test.key, i + 1);
-            assert_eq!(got, *len);
+            assert_eq!(got, len);
         }
     }
 }
@@ -43,5 +43,4 @@ fn hash_test() {
     assert_eq!(80343, hash(2, 100001));
     assert_eq!(22152, hash(2201, 100001));
     assert_eq!(15018, hash(2202, 100001));
-    assert_eq!(18311, hash(::std::u64::MAX, 100001));
 }

@@ -11,12 +11,11 @@ const JUMP: u64 = 1 << 31;
 /// # Examples
 ///
 /// ```
-/// extern crate jump_consistent_hash as jch;
-/// assert_eq!(jch::hash(0, 60), 0);
-/// assert_eq!(jch::hash(1, 60), 55);
-/// assert_eq!(jch::hash(2, 60), 46);
+/// extern crate jump_consistent_hash as jump;
+/// assert_eq!(jump::hash(0, 60), 0);
+/// assert_eq!(jump::hash(1, 60), 55);
+/// assert_eq!(jump::hash(2, 60), 46);
 /// ```
-///
 pub fn hash(key: u64, n: usize) -> u32 {
     let len = if n == 0 { 1 } else { n as i64 };
     let mut k = key;
@@ -28,4 +27,24 @@ pub fn hash(key: u64, n: usize) -> u32 {
         j = ((b + 1) as f64 * (JUMP as f64 / ((k >> 33) + 1) as f64)) as i64;
     }
     b as u32
+}
+
+pub struct Slot<T: AsRef<[u8]>> {
+    hash: Box<Fn(T) -> u64>,
+    pub buckets: usize,
+}
+
+impl<T: AsRef<[u8]>> Slot<T> {
+    pub fn new<F>(buckets: usize, func: F) -> Self
+        where F: Fn(T) -> u64 + 'static
+    {
+        let hash = Box::new(func);
+        Slot { hash, buckets }
+    }
+
+    /// Takes a key, outputs a bucket number `0..buckets`.
+    pub fn get(&self, key: T) -> u32 {
+        let key = (self.hash)(key);
+        self::hash(key, self.buckets)
+    }
 }

@@ -8,4 +8,5 @@ license = "Unlicense/MIT"
 readme = "README.md"
 description = "Jump Consistent Hash for rust"
 
-[dependencies]
+[dev-dependencies]
+seahash = "3.0"
