@@ -6,17 +6,19 @@
 
 const JUMP: u64 = 1 << 31;
 
+use std::hash;
+
 /// Takes a 64 bit key and the number of buckets, outputs a bucket number `0..buckets`.
 ///
 /// # Examples
 ///
 /// ```
 /// extern crate jump_consistent_hash as jump;
-/// assert_eq!(jump::hash(0, 60), 0);
-/// assert_eq!(jump::hash(1, 60), 55);
-/// assert_eq!(jump::hash(2, 60), 46);
+/// assert_eq!(jump::slot(0, 60), 0);
+/// assert_eq!(jump::slot(1, 60), 55);
+/// assert_eq!(jump::slot(2, 60), 46);
 /// ```
-pub fn hash(key: u64, n: usize) -> u32 {
+pub fn slot(key: u64, n: usize) -> u32 {
     let len = if n == 0 { 1 } else { n as i64 };
     let mut k = key;
     let mut b = -1;
@@ -30,21 +32,47 @@ pub fn hash(key: u64, n: usize) -> u32 {
 }
 
 pub struct Slot<T: AsRef<[u8]>> {
+    pub size: usize,
     hash: Box<Fn(T) -> u64>,
-    pub buckets: usize,
 }
 
 impl<T: AsRef<[u8]>> Slot<T> {
-    pub fn new<F>(buckets: usize, func: F) -> Self
+    pub fn new<F>(size: usize, hash: F) -> Self
         where F: Fn(T) -> u64 + 'static
     {
-        let hash = Box::new(func);
-        Slot { hash, buckets }
+        let hash = Box::new(hash);
+        Slot { size, hash }
     }
 
     /// Takes a key, outputs a bucket number `0..buckets`.
     pub fn get(&self, key: T) -> u32 {
         let key = (self.hash)(key);
-        self::hash(key, self.buckets)
+        self::slot(key, self.size)
+    }
+}
+
+pub trait NewHasher {
+    type Hasher: hash::Hasher;
+    fn new(&self) -> Self::Hasher;
+}
+
+pub struct JumpConsistentHash<N: NewHasher> {
+    pub slots: usize,
+    new_hasher: N,
+}
+
+impl<N> JumpConsistentHash<N>
+    where N: NewHasher
+{
+    pub fn new(slots: usize, new_hasher: N) -> Self {
+        JumpConsistentHash { slots, new_hasher }
+    }
+
+    /// Takes a key, outputs a bucket number `0..buckets`.
+    pub fn get<T: hash::Hash>(&self, key: &T) -> u32 {
+        use hash::Hasher;
+        let mut hasher = self.new_hasher.new();
+        key.hash(&mut hasher);
+        self::slot(hasher.finish(), self.slots)
     }
 }
