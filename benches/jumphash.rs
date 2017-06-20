@@ -35,10 +35,12 @@ fn bench_10863919174838991_11(b: &mut Bencher) {
 
 #[bench]
 fn bench_alice_11(b: &mut Bencher) {
-    let new_hasher = NewSeaHasher(0xe7b0c93ca8525013,
-                                  0x011d02b854ae8182,
-                                  0x7bcc5cf9c39cec76,
-                                  0xfa336285d102d083);
+    let new_hasher = NewSeaHasher(
+        0xe7b0c93ca8525013,
+        0x011d02b854ae8182,
+        0x7bcc5cf9c39cec76,
+        0xfa336285d102d083,
+    );
     let hash = JumpConsistentHash::new(11, new_hasher);
     let alice = &Person {
         name: "alice",

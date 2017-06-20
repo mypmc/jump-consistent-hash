@@ -38,7 +38,8 @@ pub struct Slot<T: AsRef<[u8]>> {
 
 impl<T: AsRef<[u8]>> Slot<T> {
     pub fn new<F>(size: usize, hash: F) -> Self
-        where F: Fn(T) -> u64 + 'static
+    where
+        F: Fn(T) -> u64 + 'static,
     {
         let hash = Box::new(hash);
         Slot { size, hash }
@@ -62,7 +63,8 @@ pub struct JumpConsistentHash<N: NewHasher> {
 }
 
 impl<N> JumpConsistentHash<N>
-    where N: NewHasher
+where
+    N: NewHasher,
 {
     pub fn new(slots: usize, new_hasher: N) -> Self {
         JumpConsistentHash { slots, new_hasher }

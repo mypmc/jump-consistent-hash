@@ -18,7 +18,8 @@ fn bymod(key: u64, len: usize) -> u32 {
 }
 
 fn simulate<F>(name: &'static str, before: usize, after: usize, func: F)
-    where F: Fn(u64, usize) -> u32
+where
+    F: Fn(u64, usize) -> u32,
 {
     let mut moves = 0;
 

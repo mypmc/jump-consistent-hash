@@ -21,10 +21,12 @@ struct Person {
 
 #[test]
 fn hasher_test() {
-    let new_hasher = NewSeaHasher(0xe7b0c93ca8525013,
-                                  0x011d02b854ae8182,
-                                  0x7bcc5cf9c39cec76,
-                                  0xfa336285d102d083);
+    let new_hasher = NewSeaHasher(
+        0xe7b0c93ca8525013,
+        0x011d02b854ae8182,
+        0x7bcc5cf9c39cec76,
+        0xfa336285d102d083,
+    );
     let hash1 = JumpConsistentHash::new(11, new_hasher);
     let hash2 = JumpConsistentHash::new(10, new_hasher);
     let hash3 = JumpConsistentHash::new(11, new_hasher);
